@@ -6,8 +6,19 @@ local treats = {
 	berries = 5,
 }
 
-if ModManager and ModManager:GetMod( "CampCuisine - AllHallows" ) ~= nil then
-	print( "Trick-or-Treat: added support for "..ModInfoname( "CampCuisine - AllHallows" ) )
+local function IsModEnabled(name)
+	for _, moddir in ipairs( _G.KnownModIndex:GetModsToLoad() ) do
+		local its_modinfo = _G.KnownModIndex:GetModInfo(moddir)
+		if its_modinfo.name == name then
+			return true
+		end
+	end
+	return false
+end
+
+local campcuisinename = "Camp Cuisine: All Hallows Edition"
+if IsModEnabled( campcuisinename ) then
+	print( "Trick-or-Treat: added support for "..campcuisinename )
 
 	treats.sugarskull = 1
 	treats.candyapple = 2
@@ -18,7 +29,7 @@ if ModManager and ModManager:GetMod( "CampCuisine - AllHallows" ) ~= nil then
 	treats.jammypreserves = nil
 	treats.berries = nil
 else
-	print( "Trick-or-Treat: could not find Camp Cuisine: All Hallows Edition; using default treats" )
+	print( "Trick-or-Treat: could not find "..campcuisinename.."; using default treats" )
 end
 
 return treats

@@ -8,26 +8,42 @@ end
 
 function DaysUntilHalloween()
 	local seasonmanager = GetSeasonManager()
+
 	-- only have holidays in worlds with a season cycle
 	if seasonmanager then
-		-- halloween is 83.35% into summer (as calculated by TheDanaAddams)
-		local halloweenday = math.min( seasonmanager.summerlength, math.ceil( seasonmanager.summerlength * 0.8335 ) )
+		local hasfourseasons = IsDLCEnabled ~= nil and IsDLCEnabled(REIGN_OF_GIANTS)
+		-- halloween is 83.35% into summer (as calculated by TheDanaAddams) or 2/3 into autumn
+		local halloweenday = hasfourseasons and math.min( seasonmanager.autumnlength, math.ceil( seasonmanager.autumnlength * 2/3 ) ) or math.min( seasonmanager.summerlength, math.ceil( seasonmanager.summerlength * 0.8335 ) )
 		local daysuntilhalloween = 0
 
-		if seasonmanager:IsSummer() then 
+		if (hasfourseasons and seasonmanager:IsAutumn()) or (not hasfourseasons and seasonmanager:IsSummer()) then 
 			daysuntilhalloween = RoundUp( halloweenday - (seasonmanager:GetDaysIntoSeason()+1) )
 
 			-- get rid of -0 (math.ceil of a value < 0 and > -1 will give a value of -0)
 			--if daysuntilhalloween == 0 then daysuntilhalloween = 0 end
 
 			if daysuntilhalloween < 0 then
-				daysuntilhalloween = seasonmanager:GetDaysLeftInSeason() + seasonmanager.winterlength + halloweenday
+				daysuntilhalloween = seasonmanager:GetDaysLeftInSeason() + (hasfourseasons and (seasonmanager.winterlength + seasonmanager.springlength + seasonmanager.summerlength) or seasonmanager.winterlength) + halloweenday
 			end
 		else
-			daysuntilhalloween = halloweenday + seasonmanager:GetDaysLeftInSeason()
+			local remainingrestoftheyearlength = seasonmanager:GetDaysLeftInSeason()
+			if hasfourseasons then
+				local currentseason = seasonmanager:GetSeasonString()
+				local haspastcurrentseason = false
+				local seasonsinorder = {"winter", "spring", "summer"}
+				for i,season in ipairs(seasonsinorder) do
+					if haspastcurrentseason then
+						remainingrestoftheyearlength = remainingrestoftheyearlength + seasonmanager:GetSeasonLength(season)
+					end
+					if season == currentseason then
+						haspastcurrentseason = true
+					end
+				end
+			end
+			daysuntilhalloween = halloweenday + remainingrestoftheyearlength
 		end
 
-		print( "days until halloween: "..daysuntilhalloween )
+		print( "Days until Halloween: "..daysuntilhalloween )
 
 		return daysuntilhalloween
 	end

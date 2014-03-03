@@ -20,7 +20,6 @@ local Vector3 = GLOBAL.Vector3
 local GetClock = GLOBAL.GetClock
 local GetString = GLOBAL.GetString
 
-require "trickortreat.fixedclass"
 require "trickortreat.widgets.uiholidays"
 require "trickortreat.strings"
 local treats = require "trickortreat.treats"
@@ -218,6 +217,7 @@ end
 	Make player costumed
 ]]--
 
+--[[ DLC support update broke this method
 -- need to add the component in here, otherwise OnSave doesn't work right
 AddPrefabPostInit("world", function(inst)
 	GLOBAL.assert( GLOBAL.GetPlayer() == nil )
@@ -237,12 +237,16 @@ AddPrefabPostInit("world", function(inst)
 		return inst
 	end
 end)
+]]--
 
 --[[
 	Halloween related stuff
 ]]--
 
 AddSimPostInit( function(inst)
+	-- TODO: Revert back to a better method that can support save data (luckily this doesn't need it)
+	inst:AddComponent("costumed")
+
 	inst:ListenForEvent("halloweenstart", function()
 		if not GetClock():IsNight() and inst.components.talker then
 			inst.components.talker:Say( GetString( inst.prefab, "TRICKORTREAT", "HALLOWEEN_STARTED" ) )
