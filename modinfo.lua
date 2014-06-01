@@ -12,7 +12,7 @@ version = "1.1.1"
 forumthread = "/files/file/335-trick-or-treat/"
 
 -- This lets other players know if your mod is out of date, update it to match the current version in the game
-api_version = 5
+api_version = 6
 
 -- Can specify a custom icon for this mod!
 icon_atlas = "modicon.xml"
